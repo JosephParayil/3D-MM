@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-include_directories(C:/Users/josep/Documents/Cpp/_PACKAGES/myLibs)
+include_directories(../personal-cpp-libraries)
 
 # Find SFML
 find_package(SFML 3 REQUIRED COMPONENTS System Window Graphics Audio)

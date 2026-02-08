@@ -1,0 +1,365 @@
+In file included from /home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:26,
+                 from /home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_camera.hpp:14,
+                 from /home/arya/repos/code4changemm/3d-mm/main.cpp:6:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:14:63: error: ‘Camera’ does not name a type
+   14 |     static sf::Vector2f convert_3d_to_2d(vec4 point_3d, const Camera& camera) {
+      |                                                               ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:23:43: error: ‘Camera’ does not name a type
+   23 |     virtual float calculateDistance(const Camera& camera) = 0;
+      |                                           ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:24:29: error: ‘Camera’ does not name a type
+   24 |     float getDistance(const Camera& camera) {
+      |                             ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:34:57: error: ‘Camera’ does not name a type
+   34 |                                                   const Camera& camera) = 0;
+      |                                                         ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:36:47: error: ‘Camera’ does not name a type
+   36 |     void draw(sf::RenderWindow& window, const Camera& camera,
+      |                                               ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In static member function ‘static sf::Vector2f Object3D::convert_3d_to_2d(vec4, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:15:24: error: request for member ‘FOV’ in ‘camera’, which is of non-class type ‘const int’
+   15 |         return {camera.FOV * point_3d.x / point_3d.z,
+      |                        ^~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:16:24: error: request for member ‘FOV’ in ‘camera’, which is of non-class type ‘const int’
+   16 |                 camera.FOV * point_3d.y / point_3d.z};
+      |                        ^~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:16:53: error: could not convert ‘{<expression error>, <expression error>}’ from ‘<brace-enclosed initializer list>’ to ‘sf::Vector2f’ {aka ‘sf::Vector2<float>’}
+   16 |                 camera.FOV * point_3d.y / point_3d.z};
+      |                                                     ^
+      |                                                     |
+      |                                                     <brace-enclosed initializer list>
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:52:35: error: ‘Camera’ does not name a type
+   52 |     float calculateDistance(const Camera& camera) override {
+      |                                   ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:68:49: error: ‘Camera’ does not name a type
+   68 |                                           const Camera& camera) override {
+      |                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual float Line3D::calculateDistance(const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:59:25: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+   59 |                 (camera.cf.get_position() - intermediate).magnitude();
+      |                         ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual std::unique_ptr<Shape2D> Line3D::computeShape(sf::RenderWindow&, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:69:38: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+   69 |         mat4 camera_inverse = camera.cf.inverse_rigid();
+      |                                      ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:107:35: error: ‘Camera’ does not name a type
+  107 |     float calculateDistance(const Camera& camera) override {
+      |                                   ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:113:49: error: ‘Camera’ does not name a type
+  113 |                                           const Camera& camera) override {
+      |                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual float Sphere3D::calculateDistance(const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:108:37: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  108 |         float center_dist = (camera.cf.get_position() - position).magnitude();
+      |                                     ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual std::unique_ptr<Shape2D> Sphere3D::computeShape(sf::RenderWindow&, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:114:38: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  114 |         mat4 camera_inverse = camera.cf.inverse_rigid();
+      |                                      ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:119:41: error: request for member ‘FOV’ in ‘camera’, which is of non-class type ‘const int’
+  119 |         float projected_radius = camera.FOV * radius / view_pos.z;
+      |                                         ^~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:137:35: error: ‘Camera’ does not name a type
+  137 |     float calculateDistance(const Camera& camera) override {
+      |                                   ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:142:49: error: ‘Camera’ does not name a type
+  142 |                                           const Camera& camera) override {
+      |                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual float Label3D::calculateDistance(const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:138:24: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  138 |         return (camera.cf.get_position() - position).magnitude();
+      |                        ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual std::unique_ptr<Shape2D> Label3D::computeShape(sf::RenderWindow&, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:143:38: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  143 |         mat4 camera_inverse = camera.cf.inverse_rigid();
+      |                                      ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:32:65: error: ‘Camera’ has not been declared
+   32 | void drawSphere(sf::RenderWindow& window, vec4 a, float radius, Camera& camera, sf::Color color = sf::Color::White) {
+      |                                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:37:59: error: ‘Camera’ has not been declared
+   37 | void draw3DLine(sf::RenderWindow& window, vec4 a, vec4 b, Camera& camera, float thickness = 1.0f) {
+      |                                                           ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:58:20: error: ‘Camera’ has not been declared
+   58 |     void depthSort(Camera& camera) {
+      |                    ^~~~~~
+In file included from /home/arya/repos/code4changemm/3d-mm/main.cpp:10:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp: In constructor ‘Physical_MM::Node::Node(vec4, vec4, Sphere3D, std::string)’:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:53: error: class ‘Physical_MM::Node’ does not have any field named ‘title’
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                     ^~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:58: error: expected ‘(’ before ‘,’ token
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                          ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:60: error: class ‘Physical_MM::Node’ does not have any field named ‘FONT’
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                            ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:64: error: expected ‘(’ before ‘)’ token
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                                ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:15: error: no matching function for call to ‘Label3D::Label3D(vec4, int, int)’
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:15: note: there are 4 candidates
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:134:5: note: candidate 1: ‘Label3D::Label3D(vec4, std::string, sf::Font)’
+  134 |     Label3D(vec4 pos, std::string t, sf::Font f)
+      |     ^~~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:134:35: note: no known conversion for argument 2 from ‘int’ to ‘std::string’ {aka ‘std::__cxx11::basic_string<char>’}
+  134 |     Label3D(vec4 pos, std::string t, sf::Font f)
+      |                       ~~~~~~~~~~~~^
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:133:5: note: candidate 2: ‘Label3D::Label3D()’
+  133 |     Label3D() = default;
+      |     ^~~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:133:5: note: candidate expects 0 arguments, 3 provided
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate 3: ‘Label3D::Label3D(const Label3D&)’
+  128 | struct Label3D : Object3D {
+      |        ^~~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate expects 1 argument, 3 provided
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate 4: ‘Label3D::Label3D(Label3D&&)’
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate expects 1 argument, 3 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:64: error: expected ‘{’ before ‘)’ token
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                                ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp: In constructor ‘Physical_MM::Physical_MM(MM)’:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:87:59: error: no matching function for call to ‘Physical_MM::Node::Node(vec4&, vec4&, Sphere3D&, Label3D&)’
+   87 |             Node newNode(position, velocity, sphere, label);
+      |                                                           ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:87:59: note: there are 4 candidates
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:28:9: note: candidate 1: ‘Physical_MM::Node::Node(vec4, vec4, Sphere3D, std::string)’
+   28 |         Node(vec4 position, vec4 velocity, Sphere3D sphere, std::string title)
+      |         ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:28:73: note: no known conversion for argument 4 from ‘Label3D’ to ‘std::string’ {aka ‘std::__cxx11::basic_string<char>’}
+   28 |         Node(vec4 position, vec4 velocity, Sphere3D sphere, std::string title)
+      |                                                             ~~~~~~~~~~~~^~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:27:9: note: candidate 2: ‘Physical_MM::Node::Node()’
+   27 |         Node() = default;
+      |         ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:27:9: note: candidate expects 0 arguments, 4 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate 3: ‘Physical_MM::Node::Node(const Physical_MM::Node&)’
+   21 |     struct Node {
+      |            ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate expects 1 argument, 4 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate 4: ‘Physical_MM::Node::Node(Physical_MM::Node&&)’
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate expects 1 argument, 4 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp: In member function ‘void Physical_MM::render(sf::RenderWindow&, Camera&)’:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:117:30: error: cannot convert ‘Camera’ to ‘int&’
+  117 |         collection.depthSort(camera);
+      |                              ^~~~~~
+      |                              |
+      |                              Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:58:28: note: initializing argument 1 of ‘void Object3D_Collection::depthSort(int&)’
+   58 |     void depthSort(Camera& camera) {
+      |                    ~~~~~~~~^~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:125:59: error: cannot convert ‘Camera’ to ‘const int&’
+  125 |             auto shape = it->second->computeShape(window, camera);
+      |                                                           ^~~~~~
+      |                                                           |
+      |                                                           Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:34:65: note: initializing argument 2 of ‘virtual std::unique_ptr<Shape2D> Object3D::computeShape(sf::RenderWindow&, const int&)’
+   34 |                                                   const Camera& camera) = 0;
+      |                                                   ~~~~~~~~~~~~~~^~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:156:43: error: cannot convert ‘Camera’ to ‘const int&’
+  156 |                 pair.second->draw(window, camera, sf::Color::Red);
+      |                                           ^~~~~~
+      |                                           |
+      |                                           Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:36:55: note: initializing argument 2 of ‘void Object3D::draw(sf::RenderWindow&, const int&, sf::Color)’
+   36 |     void draw(sf::RenderWindow& window, const Camera& camera,
+      |                                         ~~~~~~~~~~~~~~^~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:158:43: error: cannot convert ‘Camera’ to ‘const int&’
+  158 |                 pair.second->draw(window, camera, sf::Color::White);
+      |                                           ^~~~~~
+      |                                           |
+      |                                           Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:36:55: note: initializing argument 2 of ‘void Object3D::draw(sf::RenderWindow&, const int&, sf::Color)’
+   36 |     void draw(sf::RenderWindow& window, const Camera& camera,
+      |                                         ~~~~~~~~~~~~~~^~~~~~
+make[2]: *** [CMakeFiles/mm.dir/build.make:79: CMakeFiles/mm.dir/main.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/mm.dir/all] Error 2
+make: *** [Makefile:91: all] Error 2
+ ~/r/c/3d-mm   main ±  cmake --build build > wl-copy
+In file included from /home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:26,
+                 from /home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_camera.hpp:14,
+                 from /home/arya/repos/code4changemm/3d-mm/main.cpp:6:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:14:63: error: ‘Camera’ does not name a type
+   14 |     static sf::Vector2f convert_3d_to_2d(vec4 point_3d, const Camera& camera) {
+      |                                                               ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:23:43: error: ‘Camera’ does not name a type
+   23 |     virtual float calculateDistance(const Camera& camera) = 0;
+      |                                           ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:24:29: error: ‘Camera’ does not name a type
+   24 |     float getDistance(const Camera& camera) {
+      |                             ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:34:57: error: ‘Camera’ does not name a type
+   34 |                                                   const Camera& camera) = 0;
+      |                                                         ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:36:47: error: ‘Camera’ does not name a type
+   36 |     void draw(sf::RenderWindow& window, const Camera& camera,
+      |                                               ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In static member function ‘static sf::Vector2f Object3D::convert_3d_to_2d(vec4, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:15:24: error: request for member ‘FOV’ in ‘camera’, which is of non-class type ‘const int’
+   15 |         return {camera.FOV * point_3d.x / point_3d.z,
+      |                        ^~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:16:24: error: request for member ‘FOV’ in ‘camera’, which is of non-class type ‘const int’
+   16 |                 camera.FOV * point_3d.y / point_3d.z};
+      |                        ^~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:16:53: error: could not convert ‘{<expression error>, <expression error>}’ from ‘<brace-enclosed initializer list>’ to ‘sf::Vector2f’ {aka ‘sf::Vector2<float>’}
+   16 |                 camera.FOV * point_3d.y / point_3d.z};
+      |                                                     ^
+      |                                                     |
+      |                                                     <brace-enclosed initializer list>
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:52:35: error: ‘Camera’ does not name a type
+   52 |     float calculateDistance(const Camera& camera) override {
+      |                                   ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:68:49: error: ‘Camera’ does not name a type
+   68 |                                           const Camera& camera) override {
+      |                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual float Line3D::calculateDistance(const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:59:25: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+   59 |                 (camera.cf.get_position() - intermediate).magnitude();
+      |                         ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual std::unique_ptr<Shape2D> Line3D::computeShape(sf::RenderWindow&, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:69:38: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+   69 |         mat4 camera_inverse = camera.cf.inverse_rigid();
+      |                                      ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:107:35: error: ‘Camera’ does not name a type
+  107 |     float calculateDistance(const Camera& camera) override {
+      |                                   ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:113:49: error: ‘Camera’ does not name a type
+  113 |                                           const Camera& camera) override {
+      |                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual float Sphere3D::calculateDistance(const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:108:37: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  108 |         float center_dist = (camera.cf.get_position() - position).magnitude();
+      |                                     ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual std::unique_ptr<Shape2D> Sphere3D::computeShape(sf::RenderWindow&, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:114:38: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  114 |         mat4 camera_inverse = camera.cf.inverse_rigid();
+      |                                      ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:119:41: error: request for member ‘FOV’ in ‘camera’, which is of non-class type ‘const int’
+  119 |         float projected_radius = camera.FOV * radius / view_pos.z;
+      |                                         ^~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:137:35: error: ‘Camera’ does not name a type
+  137 |     float calculateDistance(const Camera& camera) override {
+      |                                   ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:142:49: error: ‘Camera’ does not name a type
+  142 |                                           const Camera& camera) override {
+      |                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual float Label3D::calculateDistance(const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:138:24: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  138 |         return (camera.cf.get_position() - position).magnitude();
+      |                        ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp: In member function ‘virtual std::unique_ptr<Shape2D> Label3D::computeShape(sf::RenderWindow&, const int&)’:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:143:38: error: request for member ‘cf’ in ‘camera’, which is of non-class type ‘const int’
+  143 |         mat4 camera_inverse = camera.cf.inverse_rigid();
+      |                                      ^~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp: At global scope:
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:32:65: error: ‘Camera’ has not been declared
+   32 | void drawSphere(sf::RenderWindow& window, vec4 a, float radius, Camera& camera, sf::Color color = sf::Color::White) {
+      |                                                                 ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:37:59: error: ‘Camera’ has not been declared
+   37 | void draw3DLine(sf::RenderWindow& window, vec4 a, vec4 b, Camera& camera, float thickness = 1.0f) {
+      |                                                           ^~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:58:20: error: ‘Camera’ has not been declared
+   58 |     void depthSort(Camera& camera) {
+      |                    ^~~~~~
+In file included from /home/arya/repos/code4changemm/3d-mm/main.cpp:10:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp: In constructor ‘Physical_MM::Node::Node(vec4, vec4, Sphere3D, std::string)’:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:53: error: class ‘Physical_MM::Node’ does not have any field named ‘title’
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                     ^~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:58: error: expected ‘(’ before ‘,’ token
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                          ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:60: error: class ‘Physical_MM::Node’ does not have any field named ‘FONT’
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                            ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:64: error: expected ‘(’ before ‘)’ token
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                                ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:15: error: no matching function for call to ‘Label3D::Label3D(vec4, int, int)’
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:15: note: there are 4 candidates
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:134:5: note: candidate 1: ‘Label3D::Label3D(vec4, std::string, sf::Font)’
+  134 |     Label3D(vec4 pos, std::string t, sf::Font f)
+      |     ^~~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:134:35: note: no known conversion for argument 2 from ‘int’ to ‘std::string’ {aka ‘std::__cxx11::basic_string<char>’}
+  134 |     Label3D(vec4 pos, std::string t, sf::Font f)
+      |                       ~~~~~~~~~~~~^
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:133:5: note: candidate 2: ‘Label3D::Label3D()’
+  133 |     Label3D() = default;
+      |     ^~~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:133:5: note: candidate expects 0 arguments, 3 provided
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate 3: ‘Label3D::Label3D(const Label3D&)’
+  128 | struct Label3D : Object3D {
+      |        ^~~~~~~
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate expects 1 argument, 3 provided
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate 4: ‘Label3D::Label3D(Label3D&&)’
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:128:8: note: candidate expects 1 argument, 3 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:32:64: error: expected ‘{’ before ‘)’ token
+   32 |               label(position + LABEL_OFFSET, 2, 0), title, FONT) {}
+      |                                                                ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp: In constructor ‘Physical_MM::Physical_MM(MM)’:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:87:59: error: no matching function for call to ‘Physical_MM::Node::Node(vec4&, vec4&, Sphere3D&, Label3D&)’
+   87 |             Node newNode(position, velocity, sphere, label);
+      |                                                           ^
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:87:59: note: there are 4 candidates
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:28:9: note: candidate 1: ‘Physical_MM::Node::Node(vec4, vec4, Sphere3D, std::string)’
+   28 |         Node(vec4 position, vec4 velocity, Sphere3D sphere, std::string title)
+      |         ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:28:73: note: no known conversion for argument 4 from ‘Label3D’ to ‘std::string’ {aka ‘std::__cxx11::basic_string<char>’}
+   28 |         Node(vec4 position, vec4 velocity, Sphere3D sphere, std::string title)
+      |                                                             ~~~~~~~~~~~~^~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:27:9: note: candidate 2: ‘Physical_MM::Node::Node()’
+   27 |         Node() = default;
+      |         ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:27:9: note: candidate expects 0 arguments, 4 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate 3: ‘Physical_MM::Node::Node(const Physical_MM::Node&)’
+   21 |     struct Node {
+      |            ^~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate expects 1 argument, 4 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate 4: ‘Physical_MM::Node::Node(Physical_MM::Node&&)’
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:21:12: note: candidate expects 1 argument, 4 provided
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp: In member function ‘void Physical_MM::render(sf::RenderWindow&, Camera&)’:
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:117:30: error: cannot convert ‘Camera’ to ‘int&’
+  117 |         collection.depthSort(camera);
+      |                              ^~~~~~
+      |                              |
+      |                              Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/3d_engine.hpp:58:28: note: initializing argument 1 of ‘void Object3D_Collection::depthSort(int&)’
+   58 |     void depthSort(Camera& camera) {
+      |                    ~~~~~~~~^~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:125:59: error: cannot convert ‘Camera’ to ‘const int&’
+  125 |             auto shape = it->second->computeShape(window, camera);
+      |                                                           ^~~~~~
+      |                                                           |
+      |                                                           Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:34:65: note: initializing argument 2 of ‘virtual std::unique_ptr<Shape2D> Object3D::computeShape(sf::RenderWindow&, const int&)’
+   34 |                                                   const Camera& camera) = 0;
+      |                                                   ~~~~~~~~~~~~~~^~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:156:43: error: cannot convert ‘Camera’ to ‘const int&’
+  156 |                 pair.second->draw(window, camera, sf::Color::Red);
+      |                                           ^~~~~~
+      |                                           |
+      |                                           Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:36:55: note: initializing argument 2 of ‘void Object3D::draw(sf::RenderWindow&, const int&, sf::Color)’
+   36 |     void draw(sf::RenderWindow& window, const Camera& camera,
+      |                                         ~~~~~~~~~~~~~~^~~~~~
+/home/arya/repos/code4changemm/3d-mm/3d_mm.hpp:158:43: error: cannot convert ‘Camera’ to ‘const int&’
+  158 |                 pair.second->draw(window, camera, sf::Color::White);
+      |                                           ^~~~~~
+      |                                           |
+      |                                           Camera
+/home/arya/repos/code4changemm/3d-mm/../personal-cpp-libraries/sfml-3d/Object3D.hpp:36:55: note: initializing argument 2 of ‘void Object3D::draw(sf::RenderWindow&, const int&, sf::Color)’
+   36 |     void draw(sf::RenderWindow& window, const Camera& camera,
+      |                                         ~~~~~~~~~~~~~~^~~~~~
+make[2]: *** [CMakeFiles/mm.dir/build.make:79: CMakeFiles/mm.dir/main.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/mm.dir/all] Error 2
+make: *** [Makefile:91: all] Error 2
