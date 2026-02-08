@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"/home/arya/repos/code4changemm/3d-mm/build/cmake_install.cmake"
+		"C:/Users/josep/Documents/Cpp/fun4/GMMP/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

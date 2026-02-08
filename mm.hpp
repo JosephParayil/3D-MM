@@ -169,6 +169,7 @@ struct MM {
     bool any_duplicate_connections() {
         for (auto it = connections.begin(); it != connections.end(); it++) {
             for (auto jt = it; jt != connections.end(); jt++) {
+                if (it == jt) continue;
                 if ((it->first == jt->first && it->second == jt->second) || (it->first == jt->second && it->second == jt->first)) {
                     return true;
                 }
@@ -176,8 +177,29 @@ struct MM {
         }
 
         return false;
-    }    
+    }      
 
+    
+
+    bool are_all_connection_references_valid() const {
+        for (const auto& [a, b] : connections) {
+            if (!nodes.contains(a) || !nodes.contains(b))
+                return false;
+        }
+        return true;
+    }
+
+    void print() const {
+        std::cout << "= = = MM = = =\n";
+        std::cout << "Nodes:\n";
+        for (const auto& node : nodes) {
+            std::cout << node.first << ": " << node.second << std::endl;
+        }
+        std::cout << "\nConnections:\n";
+        for (const auto& [a, b] : connections) {
+           std::cout << "a: " << a << " b: " << b << std::endl;
+        }
+    }
 
     void save(std::string dir) {
         // 1. Validate state before doing anything
@@ -234,8 +256,9 @@ struct MM {
         }
     }
 
-    bool operator==(const MM& b) {
+    bool operator==(const MM& b) const {
         return nodes == b.nodes && connections == b.connections;
     }
+
 };
 

@@ -46,9 +46,11 @@ int main() {
                 window.close();
             }
 
+            mm_3d.handleEvent(window, event);
             camera.handleEvent(event);
         }
         camera.update();
+        mm_3d.physics_step();
 
         // - - DRAWING - -
         window.clear();

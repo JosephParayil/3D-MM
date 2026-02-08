@@ -14,6 +14,7 @@ namespace fs = std::filesystem;
 
 const sf::Font FONT("JetBrainsMonoNerdFont-Medium.ttf");
 const vec4 LABEL_OFFSET(0, 2, 0);
+const sf::Color SELECTION_COLOR = sf::Color::Blue;
 
 struct Physical_MM {
     MM mm;
@@ -35,10 +36,12 @@ struct Physical_MM {
             return position == other.position;
         }
     };
-    std::unordered_map<std::string, Node> nodes;
+    std::unordered_map<std::string, std::unique_ptr<Node>> nodes;
 
-    std::vector<Line3D> lines;
+    std::vector<std::unique_ptr<Line3D>> lines;
     Object3D_Collection collection;
+
+    bool physics_paused = true;
 
     /*
     // ID system:
@@ -53,6 +56,7 @@ struct Physical_MM {
     */
     std::vector<std::string> id_to_title;  // same size as nodes
 
+
     static vec4 rand_position() {
         static std::random_device rd;
         static std::mt19937 gen(rd());
@@ -64,13 +68,12 @@ struct Physical_MM {
 
     void update3DObjects() {
         for (auto& node_pair : nodes) {
-            node_pair.second.sphere.position = node_pair.second.position;
-            node_pair.second.label.position =
-                node_pair.second.position + LABEL_OFFSET;
+            node_pair.second->sphere.position = node_pair.second->position;
+            node_pair.second->label.position = node_pair.second->position + LABEL_OFFSET;
         }
         for (size_t i = 0; i < lines.size(); i++) {
-            lines[i].a = nodes[mm.connections[i].first].position;
-            lines[i].b = nodes[mm.connections[i].second].position;
+            lines[i]->a = nodes[mm.connections[i].first]->position;
+            lines[i]->b = nodes[mm.connections[i].second]->position;
         }
     }
 
@@ -83,13 +86,10 @@ struct Physical_MM {
             vec4 velocity(0, 0, 0);
             Sphere3D sphere(position, 1.0f);
 
-            Node newNode(position, velocity, sphere, node.first);
-
-            nodes[node.first] = newNode;
+            nodes[node.first] = std::make_unique<Node>(position, velocity, sphere, node.first);
             id_to_title.push_back(node.first);
 
-            collection.c.push_back(
-                std::make_pair(id, &(nodes[node.first].sphere)));
+            collection.c.push_back({id, &nodes[node.first]->sphere});
 
             id++;
         }
@@ -97,21 +97,203 @@ struct Physical_MM {
         lines.reserve(mm.connections.size());
 
         for (auto& connection : mm.connections) {
-            Line3D line(nodes[connection.first].position,
-                        nodes[connection.second].position, 1.0f);
-            lines.push_back(line);
+            lines.push_back(std::make_unique<Line3D>(nodes[connection.first]->position,
+                    nodes[connection.second]->position, 1.0f));
 
-            collection.c.push_back(
-                std::make_pair(id, &lines[lines.size() - 1]));
+            collection.c.push_back({id, lines.back().get()});
             id++;
         }
 
         for (auto& node : mm.nodes) {
-            collection.c.push_back(
-                std::make_pair(id, &(nodes[node.first].label)));
+            collection.c.push_back({id, &nodes[node.first]->label});
             id++;
         }
     }
+
+    // = = = ADDITION/REMOVAL/EDITING PROTOCOLS FOR NODES = = =
+
+    void validityCheck() {
+        assert(!mm.any_self_connections());
+        assert(!mm.any_duplicate_connections());
+        assert(mm.are_all_titles_valid());
+        assert(mm.are_all_connection_references_valid());
+        assert(are_sizes_matching());
+    }
+
+    void addNode(vec4 position) {
+        //Find valid title 'New Node' or 'New Node 1', etc.
+        std::string new_title = "New Node";
+        int title_iteration = 1;
+        while (mm.nodes.contains(new_title)) new_title = "New Node " + std::to_string(title_iteration++);
+        
+        //Adding to non-physical MM
+        mm.nodes[new_title] = "New Body";
+
+        //Adding to nodes
+        Sphere3D sphere(position, 1.0f);
+        nodes[new_title] = std::make_unique<Node>(position, vec4(), sphere, new_title);
+
+        //Adding to collections; incrementing ids; adding to id-name store;
+        int new_id = nodes.size() -1;
+        id_to_title.push_back(new_title);
+
+        for (auto& pair : collection.c) {
+            if (pair.first >= new_id) {
+                pair.first++;
+            }
+        }
+
+        collection.c.push_back({new_id, &nodes[new_title]->sphere});
+
+        collection.c.push_back({new_id + nodes.size() + mm.connections.size(), &nodes[new_title]->label});
+        
+
+        validityCheck();
+    }
+
+    void removeNode(std::string title) {
+        assert(mm.nodes.contains(title) && nodes.contains(title));
+
+        //Getting ID
+        auto it = std::find(id_to_title.begin(), id_to_title.end(), title);
+        assert(it != id_to_title.end());
+        int id = std::distance(id_to_title.begin(), it);
+
+
+        //Removing
+        id_to_title.erase(it);
+        mm.nodes.erase(title);
+        nodes.erase(title);
+
+        //Decrementing 
+        for (auto& pair : collection.c) {
+            if (pair.first > id) {
+                pair.first--;
+            }
+        }
+
+        //Removing from collection
+        std::erase_if(collection.c, [id](const auto& p) {
+            return p.first == id;
+        });
+
+        //Removing all connections that once attached to this node but now must suffer the fate of death
+        size_t i = 0;
+        while (i < mm.connections.size()) {
+            const auto& conn = mm.connections[i];
+            
+            if (conn.first == title || conn.second == title) {
+                // removeConnection handles mm.connections, lines, and collection.c
+                // It uses .erase(), so we DO NOT increment 'i'
+                removeConnection(conn.first, conn.second, false);
+            } else {
+                // Only move to the next index if we didn't delete anything
+                i++;
+            }
+        }
+
+        validityCheck();
+    }
+
+    void changeNodeTitle(std::string oldTitle, std::string newTitle) {
+        assert(mm.nodes.contains(oldTitle) && nodes.contains(oldTitle));
+        assert(!(mm.nodes.contains(newTitle) || nodes.contains(newTitle)));
+
+        mm.nodes[newTitle] = std::move(mm.nodes[oldTitle]);
+        mm.nodes.erase(oldTitle);
+
+        auto it = std::find(id_to_title.begin(), id_to_title.end(), oldTitle);
+        assert(it != id_to_title.end());
+        int id = std::distance(id_to_title.begin(), it);
+        
+        id_to_title[id] = newTitle;
+        nodes[newTitle] = std::move(nodes[oldTitle]);
+        nodes.erase(oldTitle);
+
+        nodes[newTitle]->label = Label3D(nodes[newTitle]->position + LABEL_OFFSET, newTitle, FONT);
+        for (auto& pair : collection.c) {
+            // If this ID corresponds to the label of the node we just renamed
+            if (pair.first == id + nodes.size() + mm.connections.size()) {
+                pair.second = &nodes[newTitle]->label;
+            }
+        }
+
+        //Updating connections who previously referred to the old title
+        for (auto& connection : mm.connections) {
+            if (connection.first == oldTitle) connection.first = newTitle;
+            if (connection.second == oldTitle) connection.second = newTitle;
+        }
+
+        validityCheck();
+    }
+
+    void changeNodeBody(std::string title, std::string body) {
+        assert(mm.nodes.contains(title) && nodes.contains(title));
+
+        mm.nodes[title] = body;
+
+        validityCheck();
+    }
+
+
+    // = = = ADDITION/REMOVAL/EDITING PROTOCOLS FOR CONNECTIONS = = =
+
+    void addConnection(std::string first, std::string second) {
+        int id = nodes.size() + mm.connections.size();
+
+        mm.connections.push_back(std::make_pair(first, second));
+
+        //Adding line
+        lines.push_back(std::make_unique<Line3D>(nodes[first]->position, nodes[second]->position, 1.0f));
+        
+        //Incrementing ids:
+        for (auto& pair : collection.c) {
+            if (pair.first >= id) {
+                pair.first++;
+            }
+        }
+
+        //Adding to collections
+        collection.c.push_back({id, lines.back().get()});
+
+        
+        validityCheck();
+    }
+
+    void removeConnection(std::string first, std::string second, bool checkValidity = true) {
+        auto it = std::find_if(mm.connections.begin(), mm.connections.end(),
+            [&](const auto& p) {
+                return (p.first == first && p.second == second) ||
+                    (p.first == second && p.second == first);
+        }); 
+        assert(it != mm.connections.end());
+        int index = std::distance(mm.connections.begin(), it);        
+        
+        int id = index + nodes.size();
+
+        //Erasing from collection
+        std::erase_if(collection.c, [id](const auto& p) {
+            return p.first == id;
+        });
+
+        lines.erase(lines.begin() + index);
+        mm.connections.erase(it);
+
+        //Decrementing ids in collection
+        for (auto& pair : collection.c) {
+             if (pair.first > id) {
+                pair.first --;
+            }
+        }
+    
+
+        if (checkValidity) validityCheck();
+    }
+
+
+
+
+    // = = = REGULAR UPDATES = = =
 
     void render(sf::RenderWindow& window, Camera& camera) {
         collection.depthSort(camera);
@@ -150,15 +332,83 @@ struct Physical_MM {
         }
 
         for (auto& pair : collection.c) {
-            if (pair.first == selected_id ||
-                pair.first + nodes.size() + mm.connections.size() ==
-                    selected_id) {
-                pair.second->draw(window, camera, sf::Color::Red);
+            if ( pair.first == selected_id ||
+                pair.first - nodes.size() - mm.connections.size() == selected_id && selected_id != -1) {
+                pair.second->draw(window, camera, SELECTION_COLOR);
             } else {
                 pair.second->draw(window, camera, sf::Color::White);
             }
+            //Needed in Windows to prevent font drawing from corrupting everything else
+            //More efficient way to do this if you draw all the fonts, run this once, and draw everything else
+            window.resetGLStates();
         }
     }
+
+
+    void handleEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event) {
+        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            if (keyPressed->scancode == sf::Keyboard::Scan::Space) {
+                physics_paused = !physics_paused;
+            }
+        }
+    }
+
+    void physics_step() {
+        if (physics_paused) return;
+        /*
+        Forces:
+        - Attractive connection force (hooke's law)
+        - Repelling node force (columb's law)
+        - Dampening friction force
+        - Bounding attractive force
+        */
+        const float evth_const = 0.1;
+        const float hooke_K = 0.01 * evth_const;
+        const float columb_K = 250 * evth_const;
+        const float dampening_constant = std::pow(0.9, evth_const);
+        const float bounding_constant = 0.000001 * evth_const;
+
+        //Update velocities
+        for (auto& connection : mm.connections) {
+            vec4& pos1 = nodes[connection.first]->position;
+            vec4& pos2 = nodes[connection.second]->position;
+            nodes[connection.first]->velocity += (pos2 - pos1)*hooke_K;
+            nodes[connection.second]->velocity += (pos1 - pos2)*hooke_K;
+        }
+
+        for (auto& node_pair_i: nodes) {
+            //Columb's force + bounding attractive force
+            for (auto& node_pair_j: nodes) {
+                if (&node_pair_i==&node_pair_j) continue;
+                
+                float x_dist = node_pair_i.second->position.x-node_pair_j.second->position.x;
+                float y_dist = node_pair_i.second->position.y-node_pair_j.second->position.y;
+                float z_dist = node_pair_i.second->position.z-node_pair_j.second->position.z;
+
+                float r_cubed = pow(pow(x_dist, 2) + pow(y_dist, 2) + pow(z_dist, 2), 1.5);
+
+                vec4 columb_factor(columb_K*x_dist/r_cubed, columb_K*y_dist/r_cubed, columb_K*z_dist/r_cubed);
+                vec4 bounding_factor(-bounding_constant * x_dist, -bounding_constant * y_dist, -bounding_constant * z_dist);
+                node_pair_i.second->velocity += columb_factor + bounding_factor;
+            }
+            
+            //Dampening force
+            node_pair_i.second->velocity *= dampening_constant;
+
+        }
+
+        //Update positions
+        for (auto& node_pair : nodes) {
+            node_pair.second->position += node_pair.second->velocity;
+        }
+
+        //Update objects
+        update3DObjects();
+
+    }
+
+    //FILE IO
+
 
     bool are_sizes_matching() const {
         return mm.nodes.size() == nodes.size() &&
@@ -201,7 +451,7 @@ struct Physical_MM {
 
             // Update the node position if the title exists in our MM
             if (nodes.count(title)) {
-                nodes[title].position = vec4(coords[0], coords[1], coords[2]);
+                nodes[title]->position = vec4(coords[0], coords[1], coords[2]);
             }
         }
 
@@ -248,9 +498,9 @@ struct Physical_MM {
                 // Write position (x, y, z) as floats
                 // We cast to float explicitly to ensure 4-byte size regardless
                 // of vec4 internal precision
-                float coords[3] = {static_cast<float>(node.position.x),
-                                   static_cast<float>(node.position.y),
-                                   static_cast<float>(node.position.z)};
+                float coords[3] = {static_cast<float>(node->position.x),
+                                   static_cast<float>(node->position.y),
+                                   static_cast<float>(node->position.z)};
                 bin.write(reinterpret_cast<const char*>(coords),
                           sizeof(coords));
             }
@@ -276,7 +526,12 @@ struct Physical_MM {
         }
     }
 
-    bool operator==(const Physical_MM& b) {
-        return mm == b.mm && nodes == b.nodes;
+    bool operator==(const Physical_MM& b) const {
+        if (!(mm == b.mm) || nodes.size() != b.nodes.size()) return false;
+        for (auto const& [title, node_ptr] : nodes) {
+            auto it = b.nodes.find(title);
+            if (it == b.nodes.end() || !(*node_ptr == *it->second)) return false;
+        }
+        return true;
     }
 };

@@ -1,26 +1,22 @@
-#include <iostream>
+#include <SFML/Graphics.hpp>
 #include <cassert>
 #include <cmath>
+#include <iostream>
 #include <random>
-
-#include <SFML/Graphics.hpp>
+#include <sfml-3d/3d_camera.hpp>
 #include <sfml-3d/3d_engine.hpp>
 #include <sfml-3d/math4.hpp>
-#include <sfml-3d/3d_camera.hpp>
-#include "3d_mm.hpp"
 
+#include "3d_mm.hpp"
 
 int main() {
     const int HEIGHT = 1400;
-    const int WIDTH = 2100;    
+    const int WIDTH = 2100;
     sf::RenderWindow window(sf::VideoMode({WIDTH, HEIGHT}), "Mental Modeller");
 
     std::cout << "window created" << std::endl;
 
-
-    Camera camera(window, 60.0f,  0.001f, 
-        2.f, 10.f, 0.5f);
-
+    Camera camera(window, 60.0f, 0.001f, 2.f, 10.f, 0.5f);
 
     MM myMM;
 
@@ -37,34 +33,31 @@ int main() {
     myMM.connections.emplace_back("Palau", "Crooms");
     myMM.connections.emplace_back("Swidersbree", "Crooms");
     myMM.connections.emplace_back("Swidersbree", "AP Gallagher");
-    
+
     std::cout << "non-physical mm created" << std::endl;
 
     Physical_MM mm_3d(myMM);
 
     std::cout << "physical mm created" << std::endl;
 
-    while(window.isOpen()) {
-        while(const auto& event = window.pollEvent()) {
-            if(event->is<sf::Event::Closed>()) {
+    while (window.isOpen()) {
+        while (const auto& event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
-            
+
+            mm_3d.handleEvent(window, event);
             camera.handleEvent(event);
         }
         camera.update();
+        mm_3d.physics_step();
 
         // - - DRAWING - -
         window.clear();
         mm_3d.render(window, camera);
         camera.drawCrosshairIfNeeded(window);
         window.display();
-
-        
     }
-
-    
-
 
     return 0;
 }

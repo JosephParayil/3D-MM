@@ -89,7 +89,7 @@ Physical_MM randomPhysical_MM() {
     // the default result of a specific seed, ensuring the save/load 
     // actually captures state.
     for (auto& [title, node] : pmm.nodes) {
-        node.position.x += 1.0f; 
+        node->position.x += 1.0f; 
     }
     pmm.update3DObjects();
 
