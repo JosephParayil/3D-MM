@@ -7,14 +7,24 @@
 namespace fs = std::filesystem;
 #include <cassert>
 #include <random>
-#include <sfml-3d/math4.hpp>
 #include <unordered_map>
+
+
+#include <sfml-3d/math4.hpp>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
 
 #include "mm.hpp"
 
+
+
 const sf::Font FONT("JetBrainsMonoNerdFont-Medium.ttf");
+const std::string BODY_GUI_PATH = "forms/body_editor.txt";
 const vec4 LABEL_OFFSET(0, 2, 0);
-const sf::Color SELECTION_COLOR = sf::Color::Blue;
+
+const sf::Color HIGHLIGHT_COLOR = sf::Color::Blue;
+const sf::Color LINE_LABEL_COLOR = sf::Color(128, 128, 128);
+const sf::Color NEW_CONNECTION_COLOR = sf::Color::Green;
 
 struct Physical_MM {
     MM mm;
@@ -42,6 +52,9 @@ struct Physical_MM {
     Object3D_Collection collection;
 
     bool physics_paused = true;
+
+    
+
 
     /*
     // ID system:
@@ -77,9 +90,173 @@ struct Physical_MM {
         }
     }
 
-    Physical_MM() {}
+    // = = = GUI STUFF = = =
+    enum UserState {
+        DEFAULT,
+        WRITING,
+        CONNECTING,
+        DESTROYING,
+        PRUNING,
+        CREATING,
+        SAVING
+    };
 
-    Physical_MM(MM mm) : mm(mm) {
+    UserState user_state = UserState::DEFAULT;
+    int hover_id = -1;
+    int selected_id = -1;
+    int selected_id2 = -1;
+    
+    tgui::Gui gui;
+
+    tgui::ChildWindow::Ptr bodyEditorWindow;
+    tgui::EditBox::Ptr bodyEditorEditBox;
+    tgui::TextArea::Ptr bodyEditorTextArea;
+    tgui::Button::Ptr addConnectionButton;
+    tgui::Button::Ptr removeNodeButton;
+
+    tgui::ChildWindow::Ptr deletionWindow;
+    tgui::Label::Ptr deleteLabel;
+    tgui::Button::Ptr confirmDeletionButton;
+    tgui::Button::Ptr cancelDeleteButton;
+
+    tgui::ChildWindow::Ptr deletionWindow_connection;
+    tgui::Label::Ptr deleteLabel_connection;
+    tgui::Button::Ptr confirmDeletionButton_connection;
+    tgui::Button::Ptr cancelDeleteButton_connection;
+
+    tgui::Button::Ptr addNodeButton;
+
+
+    
+    void exit_gui() {
+        deletionWindow_connection->close();
+        deletionWindow->close();    
+        bodyEditorWindow->close();
+        user_state = UserState::DEFAULT;
+        selected_id = selected_id2 = -1;
+    }
+
+
+    Camera& camera;
+
+    
+
+
+    static sf::Vector2f rand_2d_pos(sf::RenderWindow& window) {
+        unsigned int width = window.getSize().x;
+        unsigned int height = window.getSize().y;
+
+        const float padding = 0.5;
+
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_real_distribution<float> x_dist(width*padding, width*(1-padding));
+        static std::uniform_real_distribution<float> y_dist(height*padding, height*(1-padding));
+
+        return sf::Vector2f(x_dist(gen), y_dist(gen));
+    }
+
+
+    bool isUserTyping() {
+        auto focusedWidget = gui.getFocusedLeaf();
+        if (!focusedWidget)
+            return false;
+
+        return focusedWidget->getWidgetType() == "EditBox" ||
+            focusedWidget->getWidgetType() == "TextArea";
+    }
+
+
+    Physical_MM(MM mm_, Camera& camera) : mm(mm_), camera(camera), gui(camera.window) {
+        gui.loadWidgetsFromFile(BODY_GUI_PATH);
+
+        bodyEditorWindow = gui.get<tgui::ChildWindow>("GuiWindow");
+        bodyEditorWindow->setCloseBehavior(tgui::ChildWindow::CloseBehavior::Hide);
+        bodyEditorWindow->onClose([&]() {
+            selected_id = -1; 
+            camera.allowMouseLocking = true;
+            user_state = UserState::DEFAULT;
+        });
+
+        bodyEditorEditBox = gui.get<tgui::EditBox>("TitleBox");
+        bodyEditorEditBox->onTextChange([&](const tgui::String& text) {
+            changeNodeTitle(id_to_title[selected_id], text.toStdString());
+        });
+        
+        bodyEditorTextArea = gui.get<tgui::TextArea>("BodyBox");
+        bodyEditorTextArea->onTextChange([&](const tgui::String& text) {
+            changeNodeBody(id_to_title[selected_id], text.toStdString());
+        });
+        
+        addConnectionButton = gui.get<tgui::Button>("AddConnectionButton");
+        addConnectionButton->onPress([&]() {
+            float temp = selected_id;
+            bodyEditorWindow->close();
+            selected_id = temp;
+            user_state = UserState::CONNECTING;
+        });
+
+        removeNodeButton = gui.get<tgui::Button>("DeleteCellButton");
+        removeNodeButton->onPress([&]() {
+            user_state = UserState::DESTROYING;
+            deletionWindow->setVisible(true);
+        });
+
+        deletionWindow = gui.get<tgui::ChildWindow>("DeleteWindow");
+        deletionWindow->setCloseBehavior(tgui::ChildWindow::CloseBehavior::Hide);
+        deletionWindow->onClose([&]() {
+            user_state = UserState::WRITING;
+        });
+        tgui::Label::Ptr deleteLabel = gui.get<tgui::Label>("DeleteLabel");
+
+        tgui::Button::Ptr confirmDeletionButton = gui.get<tgui::Button>("ConfirmDeleteButton");
+        confirmDeletionButton->onPress([&]() {
+            removeNode(id_to_title[selected_id]);
+            exit_gui();
+        });
+
+        tgui::Button::Ptr cancelDeleteButton = gui.get<tgui::Button>("CancelDeleteButton");
+        cancelDeleteButton->onPress([&]() {
+            deletionWindow->close();
+        });
+
+        deletionWindow_connection = gui.get<tgui::ChildWindow>("DeleteConnectionWindow");
+        deletionWindow_connection->setCloseBehavior(tgui::ChildWindow::CloseBehavior::Hide);
+        deletionWindow_connection->onClose([&]() {
+            user_state = UserState::DEFAULT;
+        });
+        tgui::Label::Ptr deleteLabel_connection = gui.get<tgui::Label>("DeleteConnectionLabel");
+
+        tgui::Button::Ptr confirmDeletionButton_connection = gui.get<tgui::Button>("DeleteConnectionButton");
+        confirmDeletionButton_connection->onPress([&]() {
+            std::cout << mm.connections.size() << std::endl;
+            std::cout << selected_id-nodes.size() << std::endl;
+            mm.print();
+            auto& connection = mm.connections[selected_id-nodes.size()];
+            //std::cout << connection.first << " " << connection.second << std::endl;
+            removeConnection(connection.first, connection.second);
+            exit_gui();
+        });
+
+        tgui::Button::Ptr cancelDeleteButton_connection = gui.get<tgui::Button>("CancelDeleteConnectionButton");
+        cancelDeleteButton_connection->onPress([&]() {
+            deletionWindow_connection->close();
+        });
+
+        tgui::Button::Ptr addNodeButton = gui.get<tgui::Button>("AddNodeButton");
+        addNodeButton->onPress([&]() {
+            mat4 cf = camera.cf;
+            cf = cf *  mat4::translation(0,0,20);
+            vec4 position = cf.get_position();
+            addNode(position);
+
+        });
+
+
+
+
+        //End of UI shenanigans
+
         size_t id = 0;
         for (auto& node : mm.nodes) {
             vec4 position = rand_position();
@@ -108,7 +285,11 @@ struct Physical_MM {
             collection.c.push_back({id, &nodes[node.first]->label});
             id++;
         }
+
+        //mm.print();
     }
+
+
 
     // = = = ADDITION/REMOVAL/EDITING PROTOCOLS FOR NODES = = =
 
@@ -159,23 +340,33 @@ struct Physical_MM {
         assert(it != id_to_title.end());
         int id = std::distance(id_to_title.begin(), it);
 
+        
 
         //Removing
         id_to_title.erase(it);
         mm.nodes.erase(title);
         nodes.erase(title);
 
-        //Decrementing 
-        for (auto& pair : collection.c) {
-            if (pair.first > id) {
-                pair.first--;
-            }
-        }
-
         //Removing from collection
+        int label_id = id + nodes.size() + mm.connections.size() + 1;
+        std::erase_if(collection.c, [id, label_id](const auto& p) {
+            return p.first == id || p.first == label_id;  // Remove both!
+        });
+
+
         std::erase_if(collection.c, [id](const auto& p) {
             return p.first == id;
         });
+
+        //Decrementing collections
+        for (auto& pair : collection.c) {
+            if (pair.first > label_id) {
+                pair.first-=2;
+            } else if (pair.first > id) {
+                pair.first--; 
+            }
+        }
+
 
         //Removing all connections that once attached to this node but now must suffer the fate of death
         size_t i = 0;
@@ -196,6 +387,8 @@ struct Physical_MM {
     }
 
     void changeNodeTitle(std::string oldTitle, std::string newTitle) {
+        if (oldTitle == newTitle) return;
+        if (!isValidFilename(newTitle)) return;
         assert(mm.nodes.contains(oldTitle) && nodes.contains(oldTitle));
         assert(!(mm.nodes.contains(newTitle) || nodes.contains(newTitle)));
 
@@ -239,10 +432,20 @@ struct Physical_MM {
     // = = = ADDITION/REMOVAL/EDITING PROTOCOLS FOR CONNECTIONS = = =
 
     void addConnection(std::string first, std::string second) {
+        auto it = std::find_if(mm.connections.begin(), mm.connections.end(),
+            [&](const auto& p) {
+                return (p.first == first && p.second == second) ||
+                    (p.first == second && p.second == first);
+        });
+
+        if (it != mm.connections.end()) return;
+
+
         int id = nodes.size() + mm.connections.size();
 
         mm.connections.push_back(std::make_pair(first, second));
 
+        std::cout << "pushed connection" << std::endl;
         //Adding line
         lines.push_back(std::make_unique<Line3D>(nodes[first]->position, nodes[second]->position, 1.0f));
         
@@ -253,9 +456,13 @@ struct Physical_MM {
             }
         }
 
+        std::cout << "pushed line and incremented stuff" << std::endl;
+
         //Adding to collections
         collection.c.push_back({id, lines.back().get()});
 
+
+        std::cout << "pushed collection" << std::endl;
         
         validityCheck();
     }
@@ -298,8 +505,8 @@ struct Physical_MM {
     void render(sf::RenderWindow& window, Camera& camera) {
         collection.depthSort(camera);
 
-        int selected_id = -1;
-        int selected_id_connection = -1;
+        hover_id = -1;
+        int hover_id_connection = -1;
 
         // If our mouse hovers both a node and a connection, we want to prefer
         // the node
@@ -307,34 +514,32 @@ struct Physical_MM {
             auto shape = it->second->computeShape(window, camera);
             if (!shape) continue;
 
-            sf::Vector2f mousePos =
-                sf::Vector2f(sf::Mouse::getPosition(window));
+            sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
             if (shape->computeCollisionWithPoint(mousePos)) {
                 if (it->first < nodes.size() ||
-                    it->first >=
-                        nodes.size() + mm.connections.size()) {  // NODE ALERT
-                    selected_id = it->first;
+                    it->first >= nodes.size() + mm.connections.size()) {  // NODE ALERT
+                    hover_id = it->first;
                     break;
                 } else {  // Meh... a connection. Only add this if we have not
                           // found a connection before. Even then, continue the
                           // search for a node if possible
-                    if (selected_id_connection == -1 && selected_id == -1) {
-                        selected_id_connection = it->first;
+                    if (hover_id_connection == -1 && hover_id == -1) {
+                        hover_id_connection = it->first;
                     }
                 }
             }
         }
 
-        if (selected_id == -1) {
-            selected_id = selected_id_connection;
-        } else if (selected_id >= nodes.size() + mm.connections.size()) {
-            selected_id -= nodes.size() + mm.connections.size();
+        if (hover_id == -1) {
+            hover_id = hover_id_connection;
+        } else if (hover_id >= nodes.size() + mm.connections.size()) {
+            hover_id -= nodes.size() + mm.connections.size();
         }
 
         for (auto& pair : collection.c) {
-            if ( pair.first == selected_id ||
-                pair.first - nodes.size() - mm.connections.size() == selected_id && selected_id != -1) {
-                pair.second->draw(window, camera, SELECTION_COLOR);
+            if ( pair.first == hover_id ||
+                pair.first - nodes.size() - mm.connections.size() == hover_id && hover_id != -1) {
+                pair.second->draw(window, camera, HIGHLIGHT_COLOR);
             } else {
                 pair.second->draw(window, camera, sf::Color::White);
             }
@@ -342,15 +547,91 @@ struct Physical_MM {
             //More efficient way to do this if you draw all the fonts, run this once, and draw everything else
             window.resetGLStates();
         }
+
+        if (user_state == UserState::WRITING) {
+            //we selected a node 
+            tgui::Vector2f ui_pos = bodyEditorWindow->getPosition();
+            std::string title = id_to_title[selected_id];
+            Node& node = *(nodes[title]);
+            draw3DLineTo2DPoint(window, node.position, ui_pos, camera, 3.0, LINE_LABEL_COLOR);
+                
+        } else if (user_state == UserState::CONNECTING) {
+            //we are in the process of forming a new connection
+            std::string title = id_to_title[selected_id];
+            Node& node = *(nodes[title]);
+
+            sf::Vector2f mouse = sf::Vector2f(sf::Mouse::getPosition(window));
+
+            draw3DLineTo2DPoint(window, node.position, mouse, camera, 3.0, NEW_CONNECTION_COLOR);
+
+        } else if (user_state == UserState::PRUNING) { // we selected a connection
+            tgui::Vector2f ui_pos = deletionWindow_connection->getPosition();
+
+            int connection_index = selected_id - nodes.size();
+            vec4 midPos = (lines[connection_index]->a + lines[connection_index]->b) * 0.5f;
+            draw3DLineTo2DPoint(window, midPos, ui_pos, camera, 3.0, LINE_LABEL_COLOR);
+        }
+
+        gui.draw();
     }
 
 
-    void handleEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event) {
-        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            if (keyPressed->scancode == sf::Keyboard::Scan::Space) {
+
+    
+
+    bool handleEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event) {
+        bool typing = isUserTyping();
+        if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+            if (mouseButtonPressed->button == sf::Mouse::Button::Left) {  
+                if (hover_id != -1) {
+                    if (hover_id < nodes.size()) { //we selected a true node
+                        if (user_state == UserState::CONNECTING) {
+                            std::cout << "Connecting" << std::endl;
+                            if (hover_id != selected_id) {
+                                std::cout << selected_id << " " << hover_id << std::endl;
+                                addConnection(id_to_title[selected_id], id_to_title[hover_id]);
+                            }
+                            
+                            user_state = UserState::DEFAULT;
+                        } else {
+                            deletionWindow_connection->close();
+
+                            selected_id = hover_id;
+                            camera.allowMouseLocking = false;
+                            camera.mouseLocked = false;
+                            sf::Vector2f ui_pos = rand_2d_pos(window);
+                            bodyEditorWindow->setVisible(true);
+                            bodyEditorWindow->setPosition(ui_pos.x, ui_pos.y);
+                            bodyEditorEditBox->setText(id_to_title[selected_id]);
+                            bodyEditorTextArea->setText(mm.nodes[id_to_title[selected_id]]);
+                            user_state = UserState::WRITING;
+                        }
+                    } else { // we selected a chud connection
+                        bodyEditorWindow->close();
+                        
+                        selected_id = hover_id;
+                        camera.allowMouseLocking = false;
+                        camera.mouseLocked = false;
+                        sf::Vector2f ui_pos = rand_2d_pos(window);
+                        deletionWindow_connection->setVisible(true);
+                        bodyEditorWindow->setPosition(ui_pos.x, ui_pos.y);
+                        user_state = UserState::PRUNING;
+                    }
+                }
+            }
+        } else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            if (!typing && keyPressed->scancode == sf::Keyboard::Scan::Space) {
                 physics_paused = !physics_paused;
+            } else if (keyPressed->scancode == sf::Keyboard::Scan::Escape) {
+                    exit_gui();
             }
         }
+
+
+
+        gui.handleEvent(*event);
+
+        return typing;
     }
 
     void physics_step() {
@@ -416,13 +697,14 @@ struct Physical_MM {
     }
 
     //*
-    Physical_MM(std::string path)
-        : Physical_MM([&]() {
-              // This immediate-invoked lambda reconstructs the MM first
-              // so we can pass it to the delegating constructor
+    Physical_MM(std::string path, Camera& camera)
+    : Physical_MM(
+          [&path]() {
               assert(fs::exists(path) && fs::is_directory(path));
               return MM(path + "/Mental-Model");
-          }()) {
+          }(),
+          camera
+      ) {
         // At this point, the delegating constructor has already:
         // 1. Populated 'nodes' with random positions
         // 2. Created all 'lines'

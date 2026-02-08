@@ -1,8 +1,10 @@
-#include <SFML/Graphics.hpp>
+
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <random>
+
+#include <SFML/Graphics.hpp>
 #include <sfml-3d/3d_camera.hpp>
 #include <sfml-3d/3d_engine.hpp>
 #include <sfml-3d/math4.hpp>
@@ -20,44 +22,66 @@ int main() {
 
     MM myMM;
 
-    myMM.nodes["Palau Economics"] = "1. The L3C is known as the Largest Palau.";
-    myMM.nodes["L3C"] = "The Largest Lexington Crossing";
+    Physical_MM* mm_3d = new Physical_MM(myMM, camera);
 
-    myMM.nodes["Palau"] = "The greatest man (and nation)";
-    myMM.nodes["Crooms"] = "The greatest high school in sanford";
-    myMM.nodes["Swidersbree"] = "This is related to AP Gallagher";
-    myMM.nodes["AP Gallagher"] = "The goat";
 
-    myMM.connections.emplace_back("Palau Economics", "L3C");
-    myMM.connections.emplace_back("Palau", "Palau Economics");
-    myMM.connections.emplace_back("Palau", "Crooms");
-    myMM.connections.emplace_back("Swidersbree", "Crooms");
-    myMM.connections.emplace_back("Swidersbree", "AP Gallagher");
 
-    std::cout << "non-physical mm created" << std::endl;
-
-    Physical_MM mm_3d(myMM);
-
-    std::cout << "physical mm created" << std::endl;
-
+    bool locked = false;
     while (window.isOpen()) {
         while (const auto& event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
+            } else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                if (keyPressed->scancode == sf::Keyboard::Scan::P) {
+                    std::cout << "\n--- File Management ---\n";
+                    std::cout << "Would you want to Save (S) or Load (L)? ";
+                    std::string choice;
+                    std::cin >> choice;
+
+                    if (choice == "S" || choice == "s") {
+                        std::cout << "Enter directory name to save: ";
+                        std::string path;
+                        std::cin >> path;
+                        
+                        mm_3d->save(path);
+                        std::cout << "System saved to: " << path << std::endl;
+
+                    } else if (choice == "L" || choice == "l") {
+                        std::cout << "Enter directory name to load: ";
+                        std::string path;
+                        std::cin >> path;
+
+                        // Re-construct mm_3d by calling the path-based constructor
+                        // This replaces the current object with the loaded state
+                        delete mm_3d;
+                        mm_3d = new Physical_MM(path, camera);
+                        
+                        std::cout << "System loaded from: " << path << std::endl;
+                    } else {
+                        std::cout << "Operation cancelled (invalid input)." << std::endl;
+                    }
+                }
+            }
+            
+            if (!locked) {
+                camera.handleEvent(event);
             }
 
-            mm_3d.handleEvent(window, event);
-            camera.handleEvent(event);
+            locked = mm_3d->handleEvent(window, event);
         }
-        camera.update();
-        mm_3d.physics_step();
+        if (!locked) {
+            camera.update();
+        }
+        
+        mm_3d->physics_step();
 
         // - - DRAWING - -
         window.clear();
-        mm_3d.render(window, camera);
+        mm_3d->render(window, camera);
         camera.drawCrosshairIfNeeded(window);
         window.display();
     }
 
+    delete mm_3d;
     return 0;
 }
